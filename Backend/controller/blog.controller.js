@@ -24,7 +24,7 @@ export const createBlog = async (req, res) => {
     if (!about)return res.status(400).json({ message: "about is required" });
     
     const  adminName=req?.user?.name;
-    const adminPhoto=req?.user?.photo;
+    const adminPhoto=req?.user?.photo?.url;
     const createdBy=req?.user?._id;
 
 

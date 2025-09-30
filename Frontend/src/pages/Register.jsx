@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React from 'react'
+import toast from 'react-hot-toast'
 import { Link } from 'react-router-dom'
 
 function Register() {
@@ -37,14 +38,14 @@ function Register() {
    try {
     const {data}=await axios.post("http://localhost:4001/api/users/register",
       formData,{
-       
+      withCredentials:true,
 headers:{
   "Content-Type":"multipart/form-data"
      }    
     });
      console.log(data);
    
-    alert("User Registerd Successfully");
+    toast.success("User Registerd Successfully");
     setName("");
     setEmail("");
     setPassword("");
@@ -54,6 +55,7 @@ headers:{
     setPhotoPreview("");
    } catch (error) {
     console.log(error);
+    toast.error(error.message || "please fill the required fields");
    }
   }
   return (

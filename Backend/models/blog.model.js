@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const blogSchema=new mongoose.Schema({  
     title:{
         type:String,
-        requried:true,
+        required:true,
     },
     blogImage:{
         public_id:{
