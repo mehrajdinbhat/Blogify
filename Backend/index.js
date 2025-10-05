@@ -5,6 +5,9 @@ import mongoose from "mongoose";
 
 import userRoute from "./routes/User.route.js";
 import blogRoute from "./routes/blog.route.js";
+import contactRoute from "./routes/contact.route.js";
+
+
 
 import fileUpload from "express-fileupload";
 import { v2 as cloudinary } from 'cloudinary';
@@ -51,6 +54,8 @@ try {
  // defining routes 
 app.use("/api/users",userRoute)
 app.use("/api/blogs",blogRoute)
+app.use("/api", contactRoute);
+
 
 
 

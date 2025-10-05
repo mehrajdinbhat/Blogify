@@ -1,9 +1,12 @@
 import axios from "axios";
 import React from "react";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 function Login() {
+  const { isAuthenticated,setIsAuthenticated,setProfile } =useAuth();
+  const navigateTo = useNavigate();
   const [role, setRole] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -27,10 +30,13 @@ function Login() {
       );
       console.log(data);
       toast.success("User Logind Successfully");
+      setProfile(data.user || data);
+      setIsAuthenticated(true);
 
       setEmail("");
       setPassword("");
       setRole("");
+      navigateTo("/");
     } catch (error) {
       console.log(error);
       toast.error(error.message || "please fill the required fields");
@@ -76,7 +82,7 @@ function Login() {
             </div>
 
             <p className="text-center mb-4">
-              New User? <Link className="text-blue-600">Register Now</Link>
+              New User? <Link to="/register"className="text-blue-600">Register Now </Link>
             </p>
             <button
               type="submit"

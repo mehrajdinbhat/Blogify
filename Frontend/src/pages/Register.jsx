@@ -1,63 +1,73 @@
-import axios from 'axios'
-import React from 'react'
-import toast from 'react-hot-toast'
-import { Link } from 'react-router-dom'
+import axios from "axios";
+import React from "react";
+import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthProvider";
 
 function Register() {
-  const [role,setRole]=React.useState("")
-  const[name,setName]=React.useState("")
-  const[email,setEmail]=React.useState("")
-  const[phone,setPhone]=React.useState("")
-  const[password,setPassword]=React.useState("")
-  const [education,SetEducation]=React.useState("")
-  const [photo,setPhoto]=React.useState("")
-  const[photoPreview,setPhotoPreview]=React.useState("")
+  const { isAuthenticated, setIsAuthenticated,setProfile} = useAuth();
+  const navigateTo = useNavigate();
 
-  const changePhotoHandeler=(e)=>{
+  const [role, setRole] = React.useState("");
+  const [name, setName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [education, SetEducation] = React.useState("");
+  const [photo, setPhoto] = React.useState("");
+  const [photoPreview, setPhotoPreview] = React.useState("");
+
+  const changePhotoHandeler = (e) => {
     console.log(e);
-    const file=e.target.files[0];
-    const reader=new FileReader();
+    const file = e.target.files[0];
+    const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onloadend=()=>{
-      setPhotoPreview(reader.result)
-      setPhoto(file)
-    }
+    reader.onloadend = () => {
+      setPhotoPreview(reader.result);
+      setPhoto(file);
+    };
   };
-  const handleRegister=async(e)=>{
+  const handleRegister = async (e) => {
     e.preventDefault();
     console.log({ role, name, email, phone, password, education, photo });
 
-    const formData=new FormData();
-    formData.append("role",role)
-    formData.append("name",name)
-    formData.append("email",email)
-    formData.append("phone",phone)
-    formData.append("password",password)
-    formData.append("education",education)
-    formData.append("photo",photo)
-   try {
-    const {data}=await axios.post("http://localhost:4001/api/users/register",
-      formData,{
-      withCredentials:true,
-headers:{
-  "Content-Type":"multipart/form-data"
-     }    
-    });
-     console.log(data);
-   
-    toast.success("User Registerd Successfully");
-    setName("");
-    setEmail("");
-    setPassword("");
-    setRole("");
-    SetEducation("");
-    setPhoto("");
-    setPhotoPreview("");
-   } catch (error) {
-    console.log(error);
-    toast.error(error.message || "please fill the required fields");
-   }
-  }
+    const formData = new FormData();
+    formData.append("role", role);
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("password", password);
+    formData.append("education", education);
+    formData.append("photo", photo);
+    try {
+      const { data } = await axios.post(
+        "http://localhost:4001/api/users/register",
+        formData,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      console.log(data);
+
+      toast.success("User Registerd Successfully");
+      setProfile(data);
+      setIsAuthenticated(true);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setRole("");
+      SetEducation("");
+      setPhoto("");
+      setPhotoPreview("");
+      navigateTo("/");
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message || "please fill the required fields");
+    }
+  };
   return (
     <div>
       <div className="min-h-screen flex items-center justify-center bg-gray-200">
@@ -151,4 +161,4 @@ headers:{
   );
 }
 
-export default Register
+export default Register;

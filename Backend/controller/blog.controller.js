@@ -85,7 +85,7 @@ export const getSingBlogs = async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "invalid id" });
   }
-  const blog = await Blog.findById();
+  const blog = await Blog.findById(id);
   if (!blog) {
     return res.status(404).json({ message: "blog not found" });
   }
@@ -97,14 +97,73 @@ export const getMyBlogs = async(req,res)=>{
   const myBlogs = await Blog.find({createdBy});
   res.status(200).json(myBlogs)
 }
-export const updateBlog = async(req,res)=>{
-  const {id}=req.params;
-  if(!mongoose.Types.ObjectId.isValid(id)){
-    return res.status(400).json({message:"invalid blog id"});
+// export const updateBlog = async(req,res)=>{
+//   const {id}=req.params;
+//   if(!mongoose.Types.ObjectId.isValid(id)){
+//     return res.status(400).json({message:"invalid blog id"});
+//   }
+//   const updateBlog=await Blog.findByIdAndUpdate(id,req.body,{new:true})
+//   if(!updateBlog){
+//     return res.status(404).json({message:"blog not found"})
+//   }
+//   res.status(200).json(updateBlog);
+// }
+export const updateBlog = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid blog id" });
+    }
+
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return res.status(404).json({ message: "Blog not found" });
+    }
+
+    let blogImageData = blog.blogImage; // keep old image by default
+
+    // If new image is uploaded
+    if (req.files && req.files.blogImage) {
+      const { blogImage } = req.files;
+
+      const allowedformat = /jpg|jpeg|png/;
+      if (!allowedformat.test(blogImage.mimetype)) {
+        return res
+          .status(400)
+          .json({ message: "please upload jpg|jpeg|png format" });
+      }
+
+      // delete old image from cloudinary
+      if (blog.blogImage && blog.blogImage.public_id) {
+        await cloudinary.uploader.destroy(blog.blogImage.public_id);
+      }
+
+      // upload new one
+      const cloudinaryResponse = await cloudinary.uploader.upload(
+        blogImage.tempFilePath
+      );
+
+      blogImageData = {
+        public_id: cloudinaryResponse.public_id,
+        url: cloudinaryResponse.url,
+      };
+    }
+
+    // update fields
+    const { title, category, about } = req.body;
+    blog.title = title || blog.title;
+    blog.category = category || blog.category;
+    blog.about = about || blog.about;
+    blog.blogImage = blogImageData;
+
+    const updatedBlog = await blog.save();
+
+    res.status(200).json({
+      message: "Blog updated successfully",
+      blog: updatedBlog,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
   }
-  const updateBlog=await Blog.findByIdAndUpdate(id,req.body,{new:true})
-  if(!updateBlog){
-    return res.status(404).json({message:"blog not found"})
-  }
-  res.status(200).json(updateBlog);
-}
+};
