@@ -2,7 +2,6 @@ import express from "express"
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 
-
 import userRoute from "./routes/User.route.js";
 import blogRoute from "./routes/blog.route.js";
 import contactRoute from "./routes/contact.route.js";
